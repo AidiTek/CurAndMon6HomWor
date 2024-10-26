@@ -97,5 +97,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
 
+    implementation ("io.insert-koin:koin-core:3.5.6")
+    implementation ("io.insert-koin:koin-android:3.5.6")
 
 }

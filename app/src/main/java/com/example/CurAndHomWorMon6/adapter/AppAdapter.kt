@@ -23,7 +23,7 @@ class AppAdapter(
             binding.tvSeein2.text = character.created
             Glide.with(binding.ivImage.context)
                 .load(character.image)
-                .placeholder(R.drawable.lana)
+                .placeholder(R.drawable.ic_launcher_foreground)
                 .into(binding.ivImage)
 
             itemView.setOnClickListener {

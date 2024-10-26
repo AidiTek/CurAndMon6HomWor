@@ -5,8 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.CurAndHomWorMon6.Resource
 import com.projectx.CurAndHomWorMon6.databinding.FragmentFirstBinding
 import com.projectx.CurAndHomWorMon6.adapter.AppAdapter
 import com.projectx.CurAndHomWorMon6.viewModel.FragmentViewModel
@@ -24,34 +27,52 @@ class FirstFragment : Fragment() {
         FragmentFirstBinding.inflate(layoutInflater)
     }
 
-    private var characteList: List<Character> = emptyList()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View? {
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view,savedInstanceState)
+        super.onViewCreated(view, savedInstanceState)
 
         val recyclerView = binding.rvApp
 
-
-        appAdapter = AppAdapter(emptyList()) { character ->
+        // Инициализация адаптера
+        appAdapter = AppAdapter { character ->
             val action = FirstFragmentDirections.actionFirstFragmentToSecondFragment(character)
             findNavController().navigate(action)
         }
-
-
-
         recyclerView.adapter = appAdapter
 
-        viewModel.characters.observe(viewLifecycleOwner, { characters ->
-            appAdapter.updateData(characters)
-        })
+        // Запуск загрузки данных
+        viewModel.loadCharacters()
+
+        // Наблюдение за данными из ViewModel
+        viewModel.characters.observe(viewLifecycleOwner) { res ->
+            binding.progresBar.isVisible = res is Resource.Loading
+            when (res) {
+                is Resource.Error -> Toast.makeText(
+                    requireContext(),
+                    res.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                is Resource.Success -> appAdapter.submitList(res.data)
+                is Resource.Loading -> {
+                    // Здесь вы можете добавить дополнительные действия, если нужно
+                    // например, показать ProgressBar или сделать что-то другое
+                }
+
+                else -> {
+                    // Резервная обработка, если возникнет непредвиденное состояние
+                }
+            }
+        }
     }
 }
+
 
 

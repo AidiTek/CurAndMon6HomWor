@@ -1,14 +1,27 @@
 package com.projectx.CurAndHomWorMon6.viewModel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.CurAndHomWorMon6.Resource
 import com.projectx.CurAndHomWorMon6.models.Character
-import com.projectx.CurAndHomWorMon6.network.Reprository2
+import com.projectx.CurAndHomWorMon6.network.Repository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SecondViewModel @Inject constructor(private val repository2: Reprository2) : ViewModel() {
+@HiltViewModel
+class SecondViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
-    fun getCharacterById(id: Int): MutableLiveData<Character?> {
-        return repository2.getCharacterById(id)
+    private val _character = MutableLiveData<Resource<Character?>>()
+    val character: LiveData<Resource<Character?>> get() = _character
+
+    fun loadCharacterById(id: Int) {
+        _character.postValue(Resource.Loading())
+        viewModelScope.launch {
+            val result = repository.getCharacterById(id)
+            _character.postValue(result)
+        }
     }
 }

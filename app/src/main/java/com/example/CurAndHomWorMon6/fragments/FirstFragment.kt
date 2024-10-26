@@ -30,6 +30,7 @@ class FirstFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View? {
         return binding.root
     }
@@ -46,21 +47,27 @@ class FirstFragment : Fragment() {
         }
         recyclerView.adapter = appAdapter
 
+        // Запуск загрузки данных
+        viewModel.loadCharacters()
+
         // Наблюдение за данными из ViewModel
         viewModel.characters.observe(viewLifecycleOwner) { res ->
             binding.progresBar.isVisible = res is Resource.Loading
-
             when (res) {
+                is Resource.Error -> Toast.makeText(
+                    requireContext(),
+                    res.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                is Resource.Success -> appAdapter.submitList(res.data)
                 is Resource.Loading -> {
-                    // Можно оставить пустым, так как вы уже управляете видимостью ProgressBar выше
+                    // Здесь вы можете добавить дополнительные действия, если нужно
+                    // например, показать ProgressBar или сделать что-то другое
                 }
-                is Resource.Error -> {
-                    // Обработка ошибки
-                    Toast.makeText(requireContext(), res.message, Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Success -> {
-                    // Обновление списка в адаптере
-                    appAdapter.submitList(res.data)
+
+                else -> {
+                    // Резервная обработка, если возникнет непредвиденное состояние
                 }
             }
         }
